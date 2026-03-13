@@ -9,6 +9,8 @@ import ProductCreatePage from './pages/ProductCreatePage';
 import ProductEditPage from './pages/ProductEditPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import MyPage from './pages/MyPage';
+import MessagesPage from './pages/MessagesPage';
+import ConversationPage from './pages/ConversationPage';
 import styles from './App.styles';
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -33,6 +35,8 @@ export default function App() {
           <Route path="/products/:id" element={<PrivateRoute><Layout><ProductDetailPage /></Layout></PrivateRoute>} />
           <Route path="/products/:id/edit" element={<PrivateRoute><Layout><ProductEditPage /></Layout></PrivateRoute>} />
           <Route path="/my" element={<PrivateRoute><Layout><MyPage /></Layout></PrivateRoute>} />
+          <Route path="/messages" element={<PrivateRoute><Layout><MessagesPage /></Layout></PrivateRoute>} />
+          <Route path="/messages/:partnerId" element={<PrivateRoute><Layout><ConversationPage /></Layout></PrivateRoute>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

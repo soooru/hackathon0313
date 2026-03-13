@@ -116,16 +116,60 @@ const styles = {
 
   messageBtn: {
     padding: '10px 20px',
-    background: colors.disabled,
+    background: colors.primary,
     color: colors.white,
     border: 'none',
     borderRadius: radius.sm,
     fontFamily: fonts.main,
     fontWeight: 600,
-    cursor: 'not-allowed',
+    cursor: 'pointer',
     fontSize: '14px',
-    opacity: 0.6,
   } as CSSProperties,
+
+  msgModalTitle: {
+    margin: '0 0 6px',
+    fontSize: '16px',
+    fontWeight: 700,
+    color: colors.text,
+  } as CSSProperties,
+
+  msgModalProduct: {
+    fontSize: '13px',
+    color: colors.textMuted,
+    marginBottom: '14px',
+  } as CSSProperties,
+
+  msgModalTextarea: {
+    width: '100%',
+    padding: '10px 12px',
+    border: `1.5px solid ${colors.border}`,
+    borderRadius: radius.sm,
+    fontSize: '14px',
+    fontFamily: fonts.main,
+    resize: 'vertical' as const,
+    minHeight: '100px',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+    marginBottom: '12px',
+  } as CSSProperties,
+
+  msgModalActions: {
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'flex-end',
+  } as CSSProperties,
+
+  msgSendBtn: (disabled: boolean): CSSProperties => ({
+    padding: '9px 20px',
+    background: disabled ? colors.disabled : colors.primary,
+    color: colors.white,
+    border: 'none',
+    borderRadius: radius.sm,
+    fontFamily: fonts.main,
+    fontWeight: 700,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontSize: '14px',
+  }),
 
   editBtn: {
     padding: '10px 20px',

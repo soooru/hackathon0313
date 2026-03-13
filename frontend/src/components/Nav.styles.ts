@@ -162,6 +162,19 @@ const styles = {
     flexDirection: 'column' as const,
   } as CSSProperties,
 
+  unreadBadge: {
+    display: 'inline-block',
+    background: '#E53E3E',
+    color: '#fff',
+    borderRadius: '9999px',
+    padding: '0px 5px',
+    fontSize: '10px',
+    fontWeight: 700,
+    marginLeft: '4px',
+    lineHeight: '16px',
+    verticalAlign: 'middle',
+  } as CSSProperties,
+
   mobileDisabledTab: {
     display: 'block',
     padding: '10px 16px',

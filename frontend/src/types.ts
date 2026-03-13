@@ -37,6 +37,28 @@ export interface Comment {
   nickname: string;
 }
 
+export interface Message {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  product_id: number | null;
+  content: string;
+  is_read: number;
+  created_at: string;
+  sender_nickname: string;
+  product_title: string | null;
+}
+
+export interface Conversation {
+  partner_id: number;
+  partner_nickname: string;
+  last_content: string;
+  last_created_at: string;
+  product_id: number | null;
+  product_title: string | null;
+  unread_count: number;
+}
+
 export interface ProductListResponse {
   products: Product[];
   total: number;

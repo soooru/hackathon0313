@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
 import styles, { tabStyle } from './Nav.styles';
 
 function useIsMobile() {
@@ -17,9 +18,17 @@ export default function Nav() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const location = useLocation();
 
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    api.get<{ count: number }>('/api/messages/unread-count')
+      .then(r => setUnreadCount(r.count))
+      .catch(() => {});
+  }, [location.pathname]);
   const userRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +57,9 @@ export default function Nav() {
               <div style={styles.mobileDropdown}>
                 <NavLink to="/" end style={({ isActive }) => tabStyle(isActive)} onClick={() => setMenuOpen(false)}>홈</NavLink>
                 <NavLink to="/products/new" style={({ isActive }) => tabStyle(isActive)} onClick={() => setMenuOpen(false)}>상품등록</NavLink>
-                <span style={styles.mobileDisabledTab}>쪽지 <span style={{ fontSize: '11px' }}>(준비 중)</span></span>
+                <NavLink to="/messages" style={({ isActive }) => tabStyle(isActive)} onClick={() => setMenuOpen(false)}>
+                  쪽지{unreadCount > 0 && <span style={styles.unreadBadge}>{unreadCount}</span>}
+                </NavLink>
               </div>
             )}
           </div>
@@ -79,7 +90,9 @@ export default function Nav() {
         <span style={styles.logo}>🛍️ 출근장터</span>
         <NavLink to="/" end style={({ isActive }) => tabStyle(isActive)}>홈</NavLink>
         <NavLink to="/products/new" style={({ isActive }) => tabStyle(isActive)}>상품등록</NavLink>
-        <span style={styles.disabledTab}>쪽지 <span style={styles.disabledTabLabel}>(준비 중)</span></span>
+        <NavLink to="/messages" style={({ isActive }) => tabStyle(isActive)}>
+          쪽지{unreadCount > 0 && <span style={styles.unreadBadge}>{unreadCount}</span>}
+        </NavLink>
         <div style={styles.spacer} />
         {user && (
           <div ref={userRef} style={styles.userMenuWrapper}>

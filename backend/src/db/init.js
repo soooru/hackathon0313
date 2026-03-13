@@ -78,10 +78,9 @@ function initDb() {
       content TEXT NOT NULL,
       is_read INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
     );
+    -- sender_id/receiver_id는 FK 없이 유지: 탈퇴 시 메시지가 '탈퇴한 사용자'로 표시됨
   `);
 
   // 허용 도메인: company.co.kr 만

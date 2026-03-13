@@ -122,13 +122,14 @@
 | GET | /api/users/me/products | 내 등록 상품 목록 |
 | DELETE | /api/users/me | 회원탈퇴 |
 
-### 쪽지 (v2.0 skeleton)
+### 쪽지 (v2.0)
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
-| GET | /api/messages | 501 Not Implemented |
-| GET | /api/messages/:id | 501 Not Implemented |
-| POST | /api/messages | 501 Not Implemented |
+| GET | /api/messages | 내 대화 목록 (상대방별 묶음, 마지막 메시지 포함) |
+| GET | /api/messages/unread-count | 읽지 않은 쪽지 수 |
+| GET | /api/messages/:partnerId | 특정 상대와의 메시지 전체 (읽음 처리 포함) |
+| POST | /api/messages | 쪽지 보내기 (receiver_id, product_id, content) |
 
 ---
 
@@ -251,9 +252,62 @@ POST /api/auth/signup  (기존 엔드포인트 재사용)
 
 ---
 
-## 7. 향후 계획 (v2.0)
+## 7. 쪽지 기능 구현 계획 (v2.0)
 
-- **쪽지 기능**: 판매자-구매자 간 1:1 쪽지함
+> 현재: 백엔드 501 skeleton + 프론트 버튼 disabled / 목표: 실제 1:1 쪽지함 구현
+
+### 7.1 DB 스키마 (기존 messages 테이블 그대로 활용)
+
+```
+messages: id, sender_id, receiver_id, product_id (nullable), content, is_read, created_at
+```
+
+대화 스레드 개념: `(product_id, sender_id, receiver_id)` 조합으로 대화 묶음 구성.
+목록 조회 시 상대방 기준으로 GROUP BY하여 마지막 메시지 표시.
+
+### 7.2 API 구현
+
+**GET /api/messages** — 내 대화 목록
+- sender_id = me OR receiver_id = me 인 메시지를 상대방별로 묶음
+- 각 대화: 상대 닉네임, 관련 상품 제목, 마지막 메시지 내용·날짜, 읽지 않은 수
+
+**GET /api/messages/unread-count** — 읽지 않은 쪽지 수
+- receiver_id = me AND is_read = 0 인 메시지 수 반환
+- Nav 뱃지 폴링용
+
+**GET /api/messages/:partnerId** — 대화 상세
+- sender/receiver가 me ↔ partnerId 인 메시지 전체, created_at ASC
+- 조회 시 receiver_id = me인 메시지 is_read = 1 업데이트
+
+**POST /api/messages** — 쪽지 보내기
+- body: `{ receiver_id, product_id, content }`
+- 본인에게 보내기 불가
+- receiver 존재 확인
+
+### 7.3 프론트엔드 구현
+
+**상품 상세 페이지 (`ProductDetailPage.tsx`)**
+- "쪽지 보내기" 버튼 활성화
+- 클릭 시 모달: 상품 제목 표시 + 메시지 입력창 + 전송 버튼
+
+**Nav (`Nav.tsx`)**
+- 쪽지 탭 활성화 (`/messages`로 라우팅)
+- 읽지 않은 수 뱃지 표시 (폴링 또는 페이지 진입 시 갱신)
+
+**쪽지함 페이지 (`MessagesPage.tsx`)**
+- 대화 목록: 상대 닉네임 + 관련 상품명 + 마지막 메시지 미리보기 + 날짜
+- 대화 클릭 → 상세 페이지로 이동
+
+**대화 상세 페이지 (`ConversationPage.tsx`)**
+- 채팅 스타일 메시지 스레드 (내 메시지 오른쪽, 상대 메시지 왼쪽)
+- 상단: 상대 닉네임 + 관련 상품 링크
+- 하단: 답장 입력창 + 전송 버튼
+- 진입 시 읽음 처리
+
+---
+
+## 8. 향후 계획 (v3.0)
+
 - 상품 이미지 업로드
 - 관심 상품 찜하기
 - 사용자 평가/후기

@@ -23,6 +23,10 @@ export default function ProductDetailPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [participants, setParticipants] = useState<GroupBuyParticipant[]>([]);
 
+  const [showMsgModal, setShowMsgModal] = useState(false);
+  const [msgText, setMsgText] = useState('');
+  const [msgSending, setMsgSending] = useState(false);
+
   const [showDots, setShowDots] = useState(false);
   const dotsRef = useRef<HTMLDivElement>(null);
 
@@ -96,6 +100,25 @@ export default function ProductDetailPage() {
       setShowPopup(true);
     } catch (err) {
       alert((err as Error).message);
+    }
+  }
+
+  async function handleSendMessage() {
+    if (!product || !msgText.trim()) return;
+    setMsgSending(true);
+    try {
+      await api.post('/api/messages', {
+        receiver_id: product.user_id,
+        product_id: product.id,
+        content: msgText.trim(),
+      });
+      setShowMsgModal(false);
+      setMsgText('');
+      navigate('/messages');
+    } catch (err) {
+      alert((err as Error).message);
+    } finally {
+      setMsgSending(false);
     }
   }
 
@@ -194,7 +217,7 @@ export default function ProductDetailPage() {
                   {joinLoading ? '처리 중...' : joined ? '🚢 배에서 하차하기' : '⛵ 한 배에 타기'}
                 </button>
               ) : (
-                <button disabled style={styles.messageBtn}>쪽지 보내기 (준비 중)</button>
+                <button onClick={() => setShowMsgModal(true)} style={styles.messageBtn}>✉️ 쪽지 보내기</button>
               )}
             </>
           )}
@@ -233,6 +256,28 @@ export default function ProductDetailPage() {
         </form>
         {error && <p style={styles.commentError}>{error}</p>}
       </div>
+
+      {showMsgModal && (
+        <div style={styles.overlay} onClick={() => setShowMsgModal(false)}>
+          <div style={styles.popup} onClick={e => e.stopPropagation()}>
+            <h3 style={styles.msgModalTitle}>✉️ 쪽지 보내기</h3>
+            <p style={styles.msgModalProduct}>📦 {product.title} · {product.nickname}님에게</p>
+            <textarea
+              value={msgText}
+              onChange={e => setMsgText(e.target.value)}
+              placeholder="메시지를 입력하세요"
+              style={styles.msgModalTextarea}
+              autoFocus
+            />
+            <div style={styles.msgModalActions}>
+              <button onClick={() => { setShowMsgModal(false); setMsgText(''); }} style={styles.popupCloseBtn}>취소</button>
+              <button onClick={handleSendMessage} disabled={!msgText.trim() || msgSending} style={styles.msgSendBtn(!msgText.trim() || msgSending)}>
+                {msgSending ? '전송 중...' : '전송'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showPopup && (
         <div style={styles.overlay} onClick={() => setShowPopup(false)}>
